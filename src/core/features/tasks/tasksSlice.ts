@@ -44,7 +44,7 @@ const initialState: TodoState = {
 };
 
 export const todoSlice = createSlice({
-	"name": "counter",
+	"name": "todoList",
 	initialState,
 	"reducers": {
 		"addTask": (state, action: PayloadAction<TodoState["value"][number]["description"]>) => {

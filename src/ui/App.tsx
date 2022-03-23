@@ -9,7 +9,7 @@ import { makeStyles } from "../theme";
 
 export function App() {
 	const dispatch = useDispatch();
-	const tasks = useSelector((state: RootState) => state.counter.value);
+	const tasks = useSelector((state: RootState) => state.todoList.value);
 	const [textInput, setTextInput] = useState("");
 
 	const handleChange = useConstCallback((e: React.ChangeEvent<HTMLInputElement>)=>{

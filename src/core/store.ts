@@ -3,7 +3,7 @@ import { todoReducer } from "./features/tasks/tasksSlice";
 
 export const store = configureStore({
 	"reducer": {
-		"counter": todoReducer
+		"todoList": todoReducer
 
 	}
 })
