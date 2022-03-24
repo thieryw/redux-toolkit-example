@@ -1,37 +1,44 @@
 import { memo } from "react";
 import type { TodoState } from "../core/features/tasks/tasksSlice"
 import { makeStyles } from "../theme";
-import {toggleTaskDone, deleteTask} from "../core/features/tasks/tasksSlice";
+import { toggleTaskDone, deleteTask, toggleTaskSelected } from "../core/features/tasks/tasksSlice";
 import { useDispatch } from "react-redux";
 import { useConstCallback } from "powerhooks/useConstCallback";
 
 type TaskProps = TodoState["value"][number];
 
 export const Task = memo((props: TaskProps) => {
-	const { description, id, isDone } = props;
+	const { description, id, isDone, isSelected } = props;
 	const dispatch = useDispatch();
 
-	const handleDeleteTask = useConstCallback(()=>{
+	const handleDeleteTask = useConstCallback((e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+		e.stopPropagation();
 		dispatch(deleteTask(id));
 	})
 
-	const handleToggleTaskIsDone = useConstCallback(()=>{
+	const handleToggleTaskIsDone = useConstCallback((e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+		e.stopPropagation();
 		dispatch(toggleTaskDone(id));
 	})
 
-	const { classes } = useStyles({isDone});
+	const handleToggleTaskSelected = useConstCallback(()=>{
+		dispatch(toggleTaskSelected(id));
+	})
 
-	return <div className={classes.root}>
-		<input checked={isDone} onClick={handleToggleTaskIsDone} type="checkbox" />
+	const { classes } = useStyles({ isDone, isSelected });
+
+	return <div onClick={handleToggleTaskSelected} className={classes.root}>
+		<input readOnly={true} checked={isDone} onClick={handleToggleTaskIsDone} type="checkbox" />
 		<p className={classes.description}>{description}</p>
 		<p onClick={handleDeleteTask} className={classes.deleteButton}>X</p>
 	</div>
 
 })
 
-const useStyles = makeStyles<{isDone: boolean}>()(
-	(theme, {isDone}) => ({
+const useStyles = makeStyles<{ isDone: boolean; isSelected: boolean }>()(
+	(theme, { isDone, isSelected }) => ({
 		"root": {
+			"backgroundColor": isSelected ? "red" : undefined,
 			"minWidth": 600,
 			"display": "flex",
 			"justifyContent": "space-between",
