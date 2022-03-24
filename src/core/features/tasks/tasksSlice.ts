@@ -8,6 +8,7 @@ export type TodoState = {
 		description: string;
 		isDone: boolean;
 		id: string;
+		isSelected: boolean;
 	}[];
 }
 
@@ -27,23 +28,26 @@ const initialState: TodoState = {
 		{
 			"description": "feed the cat",
 			"isDone": true,
-			"id": createId()
+			"id": createId(),
+			"isSelected": false
 		},
 		{
 			"description": "cook food",
 			"isDone": false,
-			"id": createId()
+			"id": createId(),
+			"isSelected": false
 		},
 		{
 			"description": "eat food",
 			"isDone": false,
-			"id": createId()
+			"id": createId(),
+			"isSelected": false
 		},
 
 	]
 };
 
-export const todoSlice = createSlice({
+export const {name, actions, reducer} = createSlice({
 	"name": "todoList",
 	initialState,
 	"reducers": {
@@ -51,16 +55,50 @@ export const todoSlice = createSlice({
 			state.value.push({
 				"description": action.payload,
 				"id": createId(),
-				"isDone": false
+				"isDone": false,
+				"isSelected": false
 			});
 		},
 		"toggleTaskDone": (state, action: PayloadAction<string>) => {
 			flip(state.value[getTaskIndexById(state.value, action.payload )], "isDone");
 		},
 
+		"toggleTaskSelected": (state, action: PayloadAction<string>) => {
+			flip(state.value[getTaskIndexById(state.value, action.payload)], "isSelected");
+		},
+
 		"deleteTask": (state, action: PayloadAction<string>) => {
 			state.value.splice(getTaskIndexById(state.value, action.payload), 1);
 
+		},
+		"selectOrUnSelectAll": (state, action : PayloadAction<"select" | "unselect">) => {
+			state.value.forEach(task => {
+				switch(action.payload){
+					case "select": 
+						if(task.isSelected) return;
+						task.isSelected = true;
+						return;
+					case "unselect": 
+						if(!task.isSelected) return;
+						task.isSelected = false;
+				}
+			})
+		},
+		"deleteSelectedTasks": (state) => {
+			state.value = state.value.filter(
+				({ isSelected }) => !isSelected
+			);
+		},
+		"doneOrUndoneSelectedTasks": (state, action: PayloadAction<"done" | "undone">) => {
+			state.value.forEach(task => {
+				if (!task.isSelected) {
+					return;
+				};
+				switch (action.payload) {
+					case "done": task.isDone = true; return;
+					case "undone": task.isDone = false;
+				}
+			});
 		},
 		"deleteAllTasks": (state) => {
 			state.value = [];
@@ -69,5 +107,14 @@ export const todoSlice = createSlice({
 });
 
 
-export const { addTask, deleteAllTasks, deleteTask, toggleTaskDone } = todoSlice.actions;
-export const { reducer: todoReducer } = todoSlice;
+
+export const {
+	addTask,
+	deleteAllTasks,
+	deleteTask,
+	toggleTaskDone,
+	deleteSelectedTasks,
+	selectOrUnSelectAll,
+	toggleTaskSelected,
+	doneOrUndoneSelectedTasks
+} = actions;
